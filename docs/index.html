@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Which Pages Get Reviewed First? — Refresh Opportunity Scoring on FlyRank Search Data</title>
+<meta name="description" content="A validated ranking model for content-refresh review, built and honestly tested on anonymized FlyRank search performance data.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F2F4F2;
+    --paper-raised:#E7EBE8;
+    --ink:#16232B;
+    --ink-soft:#51636B;
+    --line:#D3DAD6;
+    --decline:#B54A31;
+    --decline-soft:#F3E3DD;
+    --stable:#2E7D68;
+    --stable-soft:#DDEAE4;
+    --mono: 'IBM Plex Mono', monospace;
+    --serif: 'Fraunces', serif;
+    --sans: 'Inter', sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--sans);
+    font-size:17px;
+    line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{background:var(--decline-soft);}
+  a{color:var(--decline); text-decoration-thickness:1px; text-underline-offset:2px;}
+  a:hover{color:var(--stable);}
+
+  .wrap{max-width:760px; margin:0 auto; padding:0 24px;}
+
+  header.masthead{
+    border-bottom:1px solid var(--line);
+    padding:56px 0 40px;
+  }
+  .eyebrow{
+    font-family:var(--mono);
+    font-size:12.5px;
+    letter-spacing:0.09em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    display:flex; gap:10px; align-items:center;
+    margin-bottom:22px;
+  }
+  .eyebrow .dot{width:7px; height:7px; border-radius:50%; background:var(--decline); flex:none;}
+  h1{
+    font-family:var(--serif);
+    font-weight:500;
+    font-size:clamp(30px, 4.6vw, 44px);
+    line-height:1.14;
+    margin:0 0 20px;
+    max-width:14ch;
+  }
+  .subhead{
+    font-family:var(--serif);
+    font-style:italic;
+    font-weight:400;
+    font-size:19px;
+    color:var(--ink-soft);
+    max-width:48ch;
+    margin:0 0 28px;
+  }
+  .byline{
+    font-family:var(--mono);
+    font-size:13px;
+    color:var(--ink-soft);
+    display:flex; flex-wrap:wrap; gap:4px 18px;
+  }
+  .byline b{color:var(--ink); font-weight:500;}
+
+  section{padding:44px 0; border-bottom:1px solid var(--line);}
+  section:last-of-type{border-bottom:none;}
+
+  .s-eyebrow{
+    font-family:var(--mono);
+    font-size:12px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--decline);
+    margin:0 0 10px;
+  }
+  h2{
+    font-family:var(--serif);
+    font-weight:500;
+    font-size:27px;
+    margin:0 0 20px;
+    line-height:1.25;
+  }
+  h3{
+    font-family:var(--sans);
+    font-weight:600;
+    font-size:16px;
+    margin:28px 0 10px;
+  }
+  p{margin:0 0 16px;}
+  p:last-child{margin-bottom:0;}
+
+  .abstract{
+    background:var(--paper-raised);
+    border-left:3px solid var(--decline);
+    padding:24px 26px;
+    font-size:16px;
+  }
+  .abstract p{margin-bottom:12px;}
+
+  .callout{
+    background:var(--paper-raised);
+    border-radius:2px;
+    padding:20px 22px;
+    margin:20px 0;
+    font-size:15.5px;
+  }
+  .callout.stable{border-left:3px solid var(--stable);}
+  .callout.decline{border-left:3px solid var(--decline);}
+  .callout .label{
+    font-family:var(--mono); font-size:11.5px; letter-spacing:0.07em;
+    text-transform:uppercase; color:var(--ink-soft); margin-bottom:8px; display:block;
+  }
+
+  /* the "gap" motif — a dumbbell showing naive vs. honest for a metric */
+  .gap-row{display:flex; align-items:center; gap:16px; margin:14px 0; font-family:var(--mono); font-size:14px;}
+  .gap-label{width:92px; flex:none; color:var(--ink-soft);}
+  .gap-track{position:relative; flex:1; height:2px; background:var(--line); border-radius:1px;}
+  .gap-track .bar{position:absolute; top:-5px; bottom:-5px; background:linear-gradient(90deg,var(--stable-soft),var(--decline-soft)); border-radius:6px;}
+  .gap-track .dot{position:absolute; top:50%; width:11px; height:11px; border-radius:50%; transform:translate(-50%,-50%); border:2px solid var(--paper);}
+  .gap-track .dot.naive{background:var(--decline);}
+  .gap-track .dot.honest{background:var(--stable);}
+  .gap-val{width:118px; flex:none; text-align:right; font-size:13px; color:var(--ink);}
+  .gap-legend{display:flex; gap:22px; font-family:var(--mono); font-size:11.5px; color:var(--ink-soft); margin-top:6px;}
+  .gap-legend span{display:inline-flex; align-items:center; gap:6px;}
+  .gap-legend i{width:9px; height:9px; border-radius:50%; display:inline-block;}
+  .gap-legend i.naive{background:var(--decline);} .gap-legend i.honest{background:var(--stable);}
+
+  table{width:100%; border-collapse:collapse; margin:18px 0; font-size:14.5px;}
+  th,td{text-align:left; padding:9px 10px; border-bottom:1px solid var(--line);}
+  th{font-family:var(--mono); font-size:11.5px; letter-spacing:0.04em; text-transform:uppercase; color:var(--ink-soft); font-weight:500;}
+  td.num, th.num{text-align:right; font-family:var(--mono);}
+  tr.winner td{font-weight:600;}
+  tr.winner td:first-child{color:var(--stable);}
+
+  .figure{margin:26px 0;}
+  .figure img{width:100%; height:auto; display:block; background:#fff; border:1px solid var(--line); border-radius:3px;}
+  .figure figcaption{
+    font-size:13.5px; color:var(--ink-soft); margin-top:8px; padding-left:2px;
+    border-left:2px solid var(--line); padding-left:10px;
+  }
+
+  .stat-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--line); border:1px solid var(--line); margin:24px 0;}
+  .stat{background:var(--paper); padding:18px 16px;}
+  .stat .n{font-family:var(--mono); font-size:26px; font-weight:500; display:block;}
+  .stat .l{font-size:12.5px; color:var(--ink-soft); margin-top:4px; display:block;}
+
+  ol.rec{padding-left:0; list-style:none; counter-reset:rec;}
+  ol.rec li{counter-increment:rec; padding-left:44px; position:relative; margin-bottom:18px;}
+  ol.rec li::before{
+    content:counter(rec);
+    position:absolute; left:0; top:0;
+    font-family:var(--mono); font-size:13px; color:var(--paper);
+    background:var(--ink); width:26px; height:26px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+  }
+  ol.rec b{display:block; margin-bottom:2px;}
+
+  .repro-block{
+    background:var(--ink); color:var(--paper); font-family:var(--mono); font-size:13.5px;
+    padding:18px 20px; border-radius:3px; overflow-x:auto; line-height:1.7;
+  }
+  .repro-block .c{color:#7FA69B;}
+
+  footer{padding:40px 0 60px; font-size:13.5px; color:var(--ink-soft);}
+  footer a{color:var(--ink-soft); text-decoration-underline;}
+
+  .qmark{color:var(--decline); font-family:var(--serif); font-style:italic;}
+
+  @media (max-width:600px){
+    .stat-grid{grid-template-columns:1fr 1fr;}
+    .gap-row{flex-wrap:wrap;}
+    .gap-label{width:100%;}
+    .gap-val{width:auto; text-align:left;}
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="masthead">
+    <div class="eyebrow"><span class="dot"></span>FlyRank ML Internship — Capstone, Lane 2: Refresh Opportunity Scoring</div>
+    <h1>Which pages get reviewed first?</h1>
+    <p class="subhead">A ranking model for content-refresh review — and an honest look at what changes when the validation split stops leaking.</p>
+    <div class="byline">
+      <span><b>Author</b> Sakhawat</span>
+      <span><b>Repo</b> <a href="https://github.com/Sakhawat-4/my-ml-internship-v2">Sakhawat-4/my-ml-internship-v2</a></span>
+      <span><b>Data credit</b> <a href="https://flyrank.ai">FlyRank</a></span>
+    </div>
+  </header>
+
+  <section id="abstract">
+    <div class="abstract">
+      <p><b>Question.</b> Out of thousands of content pages, which ones should a reviewer with limited time look at first?</p>
+      <p><b>Data.</b> An anonymized slice of FlyRank search-performance data — 30,000 pages across 32 clients, 52 engineered features, no titles, URLs, client names, or keywords used.</p>
+      <p><b>Method.</b> A Random Forest ranker trained against a transparent rule-based baseline, validated on a client-grouped holdout — the split a reviewer actually faces, since a brand-new client's pages should never leak into training.</p>
+      <p><b>Result.</b> Measured honestly, the model roughly doubles the baseline's precision at the top of the queue (p@50: 0.74 vs 0.36) — and a naive random split would have overstated that same comparison by a wide margin, which turned out to be a finding in its own right.</p>
+      <p><b>What it's for.</b> A ranked, reason-coded queue that sits in front of a human editor — a reviewer aid, not an auto-publish decision.</p>
+    </div>
+  </section>
+
+  <section id="intro">
+    <p class="s-eyebrow">01 — Introduction</p>
+    <h2>The decision this supports</h2>
+    <p>The unit of analysis is one content page, for one client. The decision it feeds: given a reviewer who can only manually check a limited number of pages each week, which ones are worth their time first?</p>
+    <p>The action on the other end is concrete — a reviewer opens the top-ranked pages and decides whether to refresh, expand, protect, prune, or simply keep monitoring. Getting the ranking wrong costs real time in both directions: a false flag burns a reviewer's limited attention on a page that didn't need it, while a missed decliner keeps losing search visibility unnoticed until the next audit.</p>
+    <p>A hand-written rule — "flag anything with high impressions and no update in 180 days" — treats every signal as equally important and misses how they interact. The starter pipeline's own baseline already shows a learned ranking finding meaningfully more of the true decliners than that kind of fixed rule, which is the working hypothesis this capstone tests properly, on a split that can't quietly cheat.</p>
+  </section>
+
+  <section id="data">
+    <p class="s-eyebrow">02 — Data</p>
+    <h2>What went in, and what was left out on purpose</h2>
+    <div class="stat-grid">
+      <div class="stat"><span class="n">30,000</span><span class="l">pages scored</span></div>
+      <div class="stat"><span class="n">32</span><span class="l">clients (grouping unit)</span></div>
+      <div class="stat"><span class="n">52</span><span class="l">engineered features</span></div>
+    </div>
+    <p>The source is FlyRank's bundled, anonymized starter release. The label — <code>is_declining_label</code> — has a base rate of <b>0.542</b>: slightly more than half the pages in this sample are already flagged as declining, which matters, because any accuracy or precision number below is only meaningful measured against that base rate, not against zero.</p>
+    <p>Deliberately excluded: titles, URLs, client names, domains, and search keywords. Nothing client-identifying appears anywhere in this repo or in the page you're reading. Client IDs are used only as a <em>grouping</em> key for the validation split — never as a feature the model can learn from directly.</p>
+  </section>
+
+  <section id="method">
+    <p class="s-eyebrow">03 — Methodology</p>
+    <h2>Baseline, model, and the split that almost lied</h2>
+    <p>The <b>baseline</b> is a transparent, hand-readable rule built in Week 4: a small set of threshold checks on traffic, position, and freshness signals, each contributing a reason code — no black box, nothing a reviewer couldn't sanity-check by eye.</p>
+    <p>The <b>model</b> is a Random Forest, chosen over a decision tree and logistic regression on the same features (full comparison in Results). The ten most important features are traffic- and visibility-shaped, not content-shaped:</p>
+    <div class="figure">
+      <img src="img/top_feature_importance.svg" alt="Bar chart of the top 10 features by importance in the Random Forest model">
+      <figcaption>Top features by importance. <code>days_with_impressions</code> and <code>log_impressions_90d</code> lead — the model leans on sustained visibility and volume, not any single content attribute.</figcaption>
+    </div>
+
+    <h3>Why the split gets its own paragraph</h3>
+    <p>A first-pass, row-level random split put <b>31 of the 32 clients in both train and test at once</b> — meaning the model could partly learn "what client 3fdba35f0 tends to look like," not just what a declining page looks like in general. That's a leak, and it's the exact failure mode a client-grouped split exists to close: the 20% holdout used for every honest number below contains clients the model never saw during training.</p>
+    <p>A second, independent check ran the full leakage-hunt checklist against the final feature set: no label-derived or ID column made it into the model's inputs, the single highest raw correlation with the label across all 52 features was <b>0.190</b> (nowhere near the "one feature towers over the rest" pattern that signals a hidden leak), and — as a self-test of the test itself — deliberately injecting the actual leak column pushed the score to a suspicious <b>1.00 AUC</b>, confirming the harness would have caught a real leak had one been there.</p>
+  </section>
+
+  <section id="results">
+    <p class="s-eyebrow">04 — Results</p>
+    <h2>Model vs. baseline, on the same honest split</h2>
+
+    <table>
+      <thead><tr><th>Model</th><th class="num">ROC AUC</th><th class="num">Avg precision</th><th class="num">Precision@50</th><th class="num">Recall</th><th class="num">F1</th></tr></thead>
+      <tbody>
+        <tr><td>Baseline rule</td><td class="num">0.627</td><td class="num">0.468</td><td class="num">0.240</td><td class="num">—</td><td class="num">—</td></tr>
+        <tr><td>Logistic regression</td><td class="num">0.700</td><td class="num">0.522</td><td class="num">0.400</td><td class="num">0.567</td><td class="num">0.566</td></tr>
+        <tr><td>Decision tree</td><td class="num">0.742</td><td class="num">0.575</td><td class="num">0.540</td><td class="num">0.716</td><td class="num">0.634</td></tr>
+        <tr class="winner"><td>Random Forest</td><td class="num">0.750</td><td class="num">0.618</td><td class="num">0.740</td><td class="num">0.744</td><td class="num">0.640</td></tr>
+      </tbody>
+    </table>
+
+    <p>Random Forest wins on every column, selected as the final model on precision@50 — the metric that maps most directly onto "the top of a reviewer's queue."</p>
+
+    <h3>The gap that was itself a finding</h3>
+    <p>Re-scoring the same Random Forest under the naive random split versus the honest client-grouped split shows exactly how much of a first-pass result can be inflated memorization rather than a portable signal:</p>
+
+    <div class="gap-row">
+      <span class="gap-label">ROC AUC</span>
+      <div class="gap-track"><div class="bar" style="left:0%; width:8%"></div><div class="dot honest" style="left:0%"></div><div class="dot naive" style="left:8%"></div></div>
+      <span class="gap-val">0.750 → 0.758 <span style="color:var(--ink-soft)">(+0.008)</span></span>
+    </div>
+    <div class="gap-row">
+      <span class="gap-label">Avg precision</span>
+      <div class="gap-track"><div class="bar" style="left:0%; width:60%"></div><div class="dot honest" style="left:0%"></div><div class="dot naive" style="left:60%"></div></div>
+      <span class="gap-val">0.618 → 0.768 <span style="color:var(--ink-soft)">(+0.150)</span></span>
+    </div>
+    <div class="gap-row">
+      <span class="gap-label">Precision@50</span>
+      <div class="gap-track"><div class="bar" style="left:0%; width:65%"></div><div class="dot honest" style="left:0%"></div><div class="dot naive" style="left:65%"></div></div>
+      <span class="gap-val">0.740 → 0.900 <span style="color:var(--ink-soft)">(+0.160)</span></span>
+    </div>
+    <div class="gap-legend">
+      <span><i class="honest"></i>honest split (client holdout)</span>
+      <span><i class="naive"></i>naive split (row-random)</span>
+    </div>
+
+    <p style="margin-top:22px;">ROC AUC barely moved — but precision at the top of the ranking, the number a reviewer actually feels, would have looked up to 16 points better than it honestly is. That gap is the paper's real headline: <span class="qmark">not</span> "the model works," but "here is exactly how much of 'the model works' survives a fair test."</p>
+
+    <div class="callout stable">
+      <span class="label">Final, audited comparison — honest split only</span>
+      p@20: baseline 0.30 → RF 0.65 &nbsp;·&nbsp; p@50: baseline 0.36 → RF 0.74 &nbsp;·&nbsp; p@100: baseline 0.56 → RF 0.72<br>
+      <span style="font-size:13px; color:var(--ink-soft);">(The baseline figure here comes from re-scoring the same 20%-client holdout used for these RF numbers. It reads a little different from the baseline row in the table above, which scores the baseline rule over the full candidate pool rather than this specific holdout slice — a small, honest reminder that "the baseline number" depends on exactly which slice you measure it on, the same discipline this whole section applies to the model.)</span>
+    </div>
+
+    <h3>What the ranked queue actually contains</h3>
+    <div class="figure">
+      <img src="img/action_mix.svg" alt="Bar chart showing the mix of suggested actions across the ranked queue">
+      <figcaption>Suggested-action mix across all 30,000 scored pages: 13,093 monitor, 8,178 refresh, 6,657 refresh + review CTR, 1,990 refresh + review engagement, 82 expand + refresh.</figcaption>
+    </div>
+    <div class="figure">
+      <img src="img/confidence_mix.svg" alt="Bar chart showing confidence tiers across the ranked queue">
+      <figcaption>Confidence tiers: 3,605 high-confidence, 11,395 medium, 15,000 low — most of the queue sits in "worth a glance," not "certain."</figcaption>
+    </div>
+  </section>
+
+  <section id="limitations">
+    <p class="s-eyebrow">05 — Limitations &amp; honest framing</p>
+    <h2>What this can't claim</h2>
+    <p>The boldest sentence this project could have shipped was: <i>"Random Forest is the clear winner on every metric — it correctly flags 95% of the top 20 highest-risk pages."</i> That 95% figure is real, and it's also the naive-split number — exactly the one Section 4 shows was inflated. The rewritten, safe version: on a held-out set of client accounts the model never trained on, the ranking showed p@20 of 65% against a 39% base rate — an observed, directional improvement over the rule baseline on this split, meaningfully lower than the naive-split number would have suggested.</p>
+    <p>Three things this paper does not claim: it does not claim the ranking generalizes past these 32 clients — that's simply not measured here. It does not claim any causal relationship between a feature and decline — every number above is an association observed in one sample, under one split. And it does not claim to predict Google's ranking algorithm; the label is FlyRank's own operational definition of "declining," not a ground truth about search behavior.</p>
+    <p>The dataset itself is a bundled, anonymized starter slice — a fixed 30,000-row snapshot, not a live or continuously refreshed feed, and small enough (32 clients) that a handful of unusual accounts can move a metric noticeably.</p>
+  </section>
+
+  <section id="recs">
+    <p class="s-eyebrow">06 — Ranked recommendations</p>
+    <h2>What a reviewer should actually do with this</h2>
+    <ol class="rec">
+      <li><b>Treat the queue as an aid, not a verdict.</b> Use it to order attention, not to auto-publish changes — the safest first production use is inspecting the high-confidence rows and comparing the model's reasons against editorial judgment before acting.</li>
+      <li><b>Start at high-confidence, not top-rank alone.</b> Only 3,605 of 30,000 pages land in the high-confidence tier; that's a more honest starting queue than the raw top-N by score.</li>
+      <li><b>Read the reason codes, not just the score.</b> Every ranked page carries specific reason codes (e.g. <code>declining_with_demand</code>, <code>low_ctr_visible_page</code>) — they're what makes a flag checkable by a human in seconds, not a black-box number to trust blindly.</li>
+      <li><b>Re-validate before trusting a bigger release.</b> This holds for 30,000 rows and 32 clients; before leaning on it against the full ~79M-row warehouse, re-run the same client-grouped validation at that scale rather than assuming the numbers hold.</li>
+    </ol>
+  </section>
+
+  <section id="repro">
+    <p class="s-eyebrow">07 — Reproducibility</p>
+    <h2>Re-running this from a fresh clone</h2>
+    <p>Every number on this page traces back to notebooks in <code>work/notebooks/</code> — <code>w04_baseline_score</code>, <code>w05_model</code>, and <code>w06_validation_audit</code> (the naive-vs-honest split audit and leakage checks), plus the exported pipeline in <code>scripts/</code>.</p>
+    <div class="repro-block">
+<span class="c"># clone and set up</span><br>
+git clone https://github.com/Sakhawat-4/my-ml-internship-v2.git<br>
+cd my-ml-internship-v2 &amp;&amp; pip install -r requirements.txt<br><br>
+<span class="c"># regenerate the model report + charts this page uses</span><br>
+python scripts/run_all.py<br><br>
+<span class="c"># open the audit notebook that produced Section 4's gap numbers</span><br>
+jupyter notebook work/notebooks/w06_validation_audit.ipynb
+    </div>
+    <p style="margin-top:16px;">Full notebooks (research question through validation audit): <a href="https://github.com/Sakhawat-4/my-ml-internship-v2/tree/main/work/notebooks">work/notebooks/</a>. Capstone notebook mirroring this page: <a href="https://github.com/Sakhawat-4/my-ml-internship-v2/blob/main/work/notebooks/capstone.ipynb">capstone.ipynb</a>.</p>
+  </section>
+
+  <section id="ack">
+    <p class="s-eyebrow">08 — Acknowledgments &amp; data credit</p>
+    <h2>Data credit</h2>
+    <p>Built on an anonymized starter dataset provided by <a href="https://flyrank.ai">FlyRank</a> as part of its ML internship program. The full ~79M-row warehouse referenced above is hosted separately by FlyRank for internship use.</p>
+  </section>
+
+  <footer>
+    <p>FlyRank ML Internship — Lane 2 Capstone · <a href="https://github.com/Sakhawat-4/my-ml-internship-v2">source repo</a></p>
+  </footer>
+</div>
+
+</body>
+</html>
