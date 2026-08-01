@@ -1,0 +1,13 @@
+FINAL IMAGE SET (KEEPERS)
+REJECTION NOTE
+REAL CAPTURE NOTE
+
+REJECTION NOTE:
+
+I generated 1 background texture using ChatGPT.
+
+The image I received was: [describe it, e.g., "a blue abstract pattern with sharp lines"].
+
+I am rejecting this image because: [write reason, e.g., "it's too bright and would compete with my project screenshots" OR "the style doesn't match my minimal portfolio" OR "it looks like generic AI art that would distract visitors"].
+
+I will instead: [write what you'll do, e.g., "create a new background with a simpler prompt: 'Soft, minimal, muted colors, subtle waves, no sharp edges'" OR "use a plain white background and let my real screenshots be the focus"].
