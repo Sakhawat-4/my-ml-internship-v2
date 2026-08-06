@@ -1,0 +1,22 @@
+Open It on Your Phone — Fix Log
+
+Live URL: https://sakhawat-4.github.io/my-ml-internship-v2/
+Checked on: [your phone model]
+
+What I found and fixed:
+1. Results table had no horizontal scroll safeguard on mobile —
+   could squeeze/wrap on narrow screens. Fixed by wrapping the
+   table in a scrollable container (overflow-x:auto) so it
+   scrolls sideways instead of squishing.
+
+Readability: text size and line spacing already comfortable,
+no changes needed. Contrast checked — main text and links pass
+accessibility contrast standards.
+
+Images: all charts are SVG, so they stay crisp at any zoom
+level — no compression needed.
+
+Links checked: repo link, flyrank.ai (x2), work/notebooks/
+folder, capstone.ipynb — all working.
+
+Tablet/desktop: checked, layout holds up, no breaks.
