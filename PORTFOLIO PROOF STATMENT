@@ -1,0 +1,43 @@
+📋 SURVIVE THE CRIT - DELIVERABLE
+
+🔗 Live Portfolio: https://sakhawat-4.github.io/my-ml-internship-v2/
+
+📝 PROOF STATEMENT:
+"I am an ML Engineer who builds ranking models that turn raw business data into actionable predictions. My capstone on content refresh scoring achieved a 3x improvement over baseline rules (Precision@50: 0.24 → 0.74) using 52 engineered features on 30,000 pages."
+
+👥 REVIEWER STATUS:
+- GitHub Issue created: https://github.com/Sakhawat-4/my-ml-internship-v2/issues (awaiting response)
+- LinkedIn message sent to Mirza Ašćerić (awaiting response)
+- Self-review completed and documented below
+
+🔍 SELF-REVIEW FEEDBACK:
+
+1️⃣ In ten seconds, what do I do?
+"I build ML ranking models that help businesses decide which content pages to review first."
+
+2️⃣ Would you believe I'm good at it?
+"Yes, because my portfolio shows a clear 3x improvement over baseline on real data with a complete ML pipeline from data prep to evaluation."
+
+3️⃣ What's confusing?
+"Could add more visual examples of the model results."
+
+4️⃣ What's broken or missing?
+"Could include more project details and code samples."
+
+📊 MUST-FIX (ALL FIXED ON LIVE SITE):
+[✅] Issue: "Portfolio was missing clear headline" - FIXED by adding "ML Engineer" badge
+[✅] Issue: "No proof statement visible" - FIXED by adding the 3x improvement result
+[✅] Issue: "Couldn't see projects clearly" - FIXED by adding structured project section
+
+✨ NICE-TO-HAVE (Later):
+[ ] Add more visuals and screenshots
+[ ] Add LinkedIn profile
+[ ] Add more project descriptions
+[ ] Improve design with more colors
+
+✅ EVIDENCE OF FIXES:
+All fixes are LIVE at: https://sakhawat-4.github.io/my-ml-internship-v2/
+
+📂 Repository: https://github.com/Sakhawat-4/my-ml-internship-v2
+
+STATUS: SUBMITTED ✅
