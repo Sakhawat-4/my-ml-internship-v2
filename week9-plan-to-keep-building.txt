@@ -1,0 +1,1 @@
+How I'll add the next case: New page in /cases/ on my site, next to the other two cases, linked from the homepage. I'll pull one real result from the finished work, ask my Claude Project to write it as three beats (Problem → What I did → What came of it), drop it into a copy of the existing case page, add it to the homepage, and re-upload the site
