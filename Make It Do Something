@@ -1,0 +1,25 @@
+https://statuesque-khapse-d81399.netlify.app/
+
+What a Backend Is
+
+A backend is the invisible machinery that makes a website do things a plain page cannot. If the frontend is the part you see and interact with (the layout, text, and pictures), the backend is the behind-the-scenes system that processes data, remembers information, and sends emails. For my portfolio, the frontend is the page you visit. The backend is the service that takes your message and delivers it to me.
+
+What My Feature Does
+
+My one dynamic feature is a working contact form. When you fill out your name, email, and message, it doesn't just sit there. It actively sends that message to me so I can read and reply to you.
+
+How the Data Flows
+
+The path your message takes from the form to my inbox:
+
+You submit: You fill out the form and click "Send." Your data (name, email, message) is packaged up.
+
+Netlify catches it: My site is hosted on Netlify. I added a special netlify attribute to the form tag. This tells Netlify: "Pay attention to this form." When you click send, the data is sent to Netlify's servers.
+
+Netlify processes it: Netlify receives the data and handles all the complex work of processing the submission. I don't need to build or manage a server myself.
+
+Email delivery: Netlify forwards the submitted data to my email inbox. I receive everything you wrote.
+
+Confirmation: While Netlify works in the background, my page shows you a "Thanks! Your message has been sent" message so you know it worked.
+
+The data flow path: Your Browser → Netlify's Servers → My Email Inbox
